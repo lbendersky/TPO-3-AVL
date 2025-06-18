@@ -10,163 +10,175 @@ public class arbolAVL implements ABBTDA {
 		ABBTDA hijoDer;
 		int factorBalance;
 	}
-	
+
 	NodoABB raiz;
-	
-	@Override
-	public void inicializarArbol() {
-		raiz = null;
-	}
 
-	@Override
-	public void agregarElem(int x) {
-		if (raiz == null){
-			raiz = new NodoABB();
-			raiz.info = x;
-			raiz.hijoIzq = new arbolAVL();
-			raiz.hijoIzq.inicializarArbol();
-			raiz.hijoDer = new arbolAVL();
-			raiz.hijoDer.inicializarArbol();
-		} else {
-			insertarYRebalancear(raiz, x);
-		}
-	}
-
-	private boolean insertarYRebalancear(NodoABB nodo, int x) {
-    boolean alturaCambio = false;
-
-    if (x < nodo.info) {
-        if (((arbolAVL) nodo.hijoIzq).raiz == null) {
-            NodoABB nuevo = new NodoABB();
-            nuevo.info = x;
-            nuevo.hijoIzq = new arbolAVL();
-            nuevo.hijoIzq.inicializarArbol();
-            nuevo.hijoDer = new arbolAVL();
-            nuevo.hijoDer.inicializarArbol();
-            nuevo.factorBalance = 0;
-            ((arbolAVL) nodo.hijoIzq).raiz = nuevo;
-            nodo.factorBalance--;  // desbalance en el lado izquierdo
-            alturaCambio = nodo.factorBalance != 0;
-        } 
-		else {
-            alturaCambio = insertarYRebalancear(((arbolAVL) nodo.hijoIzq).raiz, x);
-            if (alturaCambio) {
-                nodo.factorBalance--;
-                alturaCambio = Math.abs(nodo.factorBalance) == 1;
-            }
-        }
-
-    } 
-	else if (x > nodo.info) {
-        if (((arbolAVL) nodo.hijoDer).raiz == null) {
-            NodoABB nuevo = new NodoABB();
-            nuevo.info = x;
-            nuevo.hijoIzq = new arbolAVL();
-            nuevo.hijoIzq.inicializarArbol();
-            nuevo.hijoDer = new arbolAVL();
-            nuevo.hijoDer.inicializarArbol();
-            nuevo.factorBalance = 0;
-            ((arbolAVL) nodo.hijoDer).raiz = nuevo;
-            nodo.factorBalance++;  // desbalance en el lado derecho
-            alturaCambio = nodo.factorBalance != 0;
-        } 
-		else {
-            alturaCambio = insertarYRebalancear(((arbolAVL) nodo.hijoDer).raiz, x);
-            if (alturaCambio) {
-                nodo.factorBalance++;
-                alturaCambio = Math.abs(nodo.factorBalance) == 1;
-            }
-        }
-
-    } 
-	else {
-        alturaCambio = false;  // ya existe el elemento
-    }
-
-    // Verificar si es necesario el rebalanceo
-    if (nodo.factorBalance == 2 || nodo.factorBalance == -2) {
-        rebalancear(nodo);
-        alturaCambio = false; // se arreglo el balance
-    }
-
-    return alturaCambio;
-	}
-
-	private NodoABB rebalancear(NodoABB nodo) {
-    if (nodo.factorBalance == -2) { // pesado en el lado izquierdo
-        NodoABB hijoIzq = ((arbolAVL) nodo.hijoIzq).raiz;
-        if (hijoIzq.factorBalance <= 0) {
-            return rotacionSimpleDerecha(nodo);
-        } 
-		else {
-            return rotacionDobleIzquierda(nodo);
-        }
-    } 
-	else if (nodo.factorBalance == 2) { // pesado en el lado derecho
-        NodoABB hijoDer = ((arbolAVL) nodo.hijoDer).raiz;
-        if (hijoDer.factorBalance >= 0) {
-            return rotacionSimpleIzquierda(nodo);
-        } 
-		else {
-            return rotacionDobleDerecha(nodo);
-        }
-    }
-    return nodo; // no imbalance
-	}
-
-
-	@Override
-	public void eliminarElem(int x) {
-		if (raiz != null) {
-			if (raiz.info == x && raiz.hijoIzq.arbolVacio() && raiz.hijoDer.arbolVacio()) {
-				raiz = null;
-			} else if (raiz.info == x && !raiz.hijoIzq.arbolVacio()) {
-				raiz.info = this.mayor(raiz.hijoIzq);
-				raiz.hijoIzq.eliminarElem(raiz.info);
-			} else if (raiz.info == x && raiz.hijoIzq.arbolVacio()) {
-				raiz.info = this.menor(raiz.hijoDer);
-				raiz.hijoDer.eliminarElem(raiz.info);
-			} else if (raiz.info < x) {
-				raiz.hijoDer.eliminarElem(x);
-			} else {
-				raiz.hijoIzq.eliminarElem(x);
-			}
-		}
-	}
-
-	@Override
 	public int raiz() {
 		return raiz.info;
 	}
 
-	@Override
 	public ABBTDA hijoIzq() {
 		return raiz.hijoIzq;
 	}
 
-	@Override
 	public ABBTDA hijoDer() {
 		return raiz.hijoDer;
 	}
 
-	@Override
 	public boolean arbolVacio() {
 		return (raiz == null);
 	}
-	
-	private int mayor(ABBTDA a){
+
+	private int mayor(ABBTDA a) {
 		if (a.hijoDer().arbolVacio())
 			return a.raiz();
 		else
 			return mayor(a.hijoDer());
-		}
-	
-	private int menor(ABBTDA a){
+	}
+
+	private int menor(ABBTDA a) {
 		if (a.hijoIzq().arbolVacio())
 			return a.raiz();
 		else
 			return mayor(a.hijoIzq());
+	}
+
+	public int altura() {
+		if (arbolVacio()) {
+			return 0;
+		} else {
+			int altIzq = raiz.hijoIzq.altura();
+			int altDer = raiz.hijoDer.altura();
+			return 1 + Math.max(altIzq, altDer);
+		}
+	}
+
+	public void inicializarArbol() {
+		raiz = null;
+	}
+
+	public void agregarElem(int x) {
+		raiz = agregarYBalancear(raiz, x);
+	}
+
+	public void eliminarElem(int x) {
+	    raiz = eliminarYBalancear(raiz, x);
+}
+
+	private NodoABB eliminarYBalancear(NodoABB nodo, int x) {
+		if (nodo == null) return null;
+
+		if (x < nodo.info) {
+			((arbolAVL) nodo.hijoIzq).raiz = eliminarYBalancear(((arbolAVL) nodo.hijoIzq).raiz, x);
+		} else if (x > nodo.info) {
+			((arbolAVL) nodo.hijoDer).raiz = eliminarYBalancear(((arbolAVL) nodo.hijoDer).raiz, x);
+		} else {
+			// Encontramos el nodo a eliminar
+
+			// Caso 1: nodo sin hijos
+			if (nodo.hijoIzq.arbolVacio() && nodo.hijoDer.arbolVacio()) {
+				return null;
+			}
+			// Caso 2: nodo con un solo hijo
+			else if (nodo.hijoIzq.arbolVacio()) {
+				return ((arbolAVL) nodo.hijoDer).raiz;
+			}
+			else if (nodo.hijoDer.arbolVacio()) {
+				return ((arbolAVL) nodo.hijoIzq).raiz;
+			}
+			// Caso 3: nodo con dos hijos
+			else {
+				// Buscar sucesor: el menor del subárbol derecho
+				int sucesor = menor(nodo.hijoDer);
+				nodo.info = sucesor;
+				((arbolAVL) nodo.hijoDer).raiz = eliminarYBalancear(((arbolAVL) nodo.hijoDer).raiz, sucesor);
+			}
+		}
+		return verificarybalancear(nodo);
+	}
+
+	private NodoABB agregarYBalancear(NodoABB nodo, int x) {
+		if (nodo == null) {
+			NodoABB nuevo = new NodoABB();
+			nuevo.info = x;
+			nuevo.hijoIzq = new arbolAVL();
+			nuevo.hijoIzq.inicializarArbol();
+			nuevo.hijoDer = new arbolAVL();
+			nuevo.hijoDer.inicializarArbol();
+			nuevo.factorBalance = 0;
+			return nuevo;
 		}
 
+		if (x < nodo.info) {
+			((arbolAVL) nodo.hijoIzq).raiz = agregarYBalancear(((arbolAVL) nodo.hijoIzq).raiz, x);
+		} else if (x > nodo.info) {
+			((arbolAVL) nodo.hijoDer).raiz = agregarYBalancear(((arbolAVL) nodo.hijoDer).raiz, x);
+		} else {
+			return nodo; // ya existe
+		}
 
+		return verificarybalancear(nodo);
+	}
+
+	private NodoABB verificarybalancear(NodoABB nodo) {
+		int altIzq = nodo.hijoIzq.altura();
+		int altDer = nodo.hijoDer.altura();
+		int balance = altDer - altIzq;
+
+		if (balance > 1) {
+			NodoABB hijoDer = ((arbolAVL) nodo.hijoDer).raiz;
+			int balanceHijo = hijoDer.hijoDer.altura() - hijoDer.hijoIzq.altura();
+			if (balanceHijo >= 0) {
+				return rotacionSimpleIzquierda(nodo);
+			} else {
+				return rotacionDobleDerecha(nodo);
+			}
+		} else if (balance < -1) {
+			NodoABB hijoIzq = ((arbolAVL) nodo.hijoIzq).raiz;
+			int balanceHijo = hijoIzq.hijoDer.altura() - hijoIzq.hijoIzq.altura();
+			if (balanceHijo <= 0) {
+				return rotacionSimpleDerecha(nodo);
+			} else {
+				return rotacionDobleIzquierda(nodo);
+			}
+		}
+
+		return nodo;
+}
+
+	private NodoABB rotacionSimpleIzquierda (NodoABB nodo){
+		NodoABB nododer = ((arbolAVL)nodo.hijoDer).raiz;
+		NodoABB subarbolintermedio = ((arbolAVL)nododer.hijoIzq).raiz;		
+
+		((arbolAVL) nodo.hijoDer).raiz = subarbolintermedio;
+		((arbolAVL) nododer.hijoIzq).raiz = nodo;
+
+		return nododer;
+	}
+
+	private NodoABB rotacionSimpleDerecha (NodoABB nodo){
+		NodoABB nodoizq = ((arbolAVL) nodo.hijoIzq).raiz;
+		NodoABB subIntermedio = ((arbolAVL) nodoizq.hijoDer).raiz;
+
+		((arbolAVL) nodo.hijoIzq).raiz = subIntermedio;
+		nodoizq.hijoDer = new arbolAVL();
+		((arbolAVL) nodoizq.hijoDer).raiz = nodo;
+
+		return nodoizq;	}
+
+	private NodoABB rotacionDobleIzquierda (NodoABB nodo){
+		NodoABB hijoIzq = ((arbolAVL) nodo.hijoIzq).raiz;
+		NodoABB nuevaRaizIzq = rotacionSimpleIzquierda(hijoIzq);
+		((arbolAVL) nodo.hijoIzq).raiz = nuevaRaizIzq;
+
+		return rotacionSimpleDerecha(nodo);
+	}
+
+	private NodoABB rotacionDobleDerecha (NodoABB nodo){
+		NodoABB hijoDer = ((arbolAVL) nodo.hijoDer).raiz;
+		NodoABB nuevaRaizDer = rotacionSimpleDerecha(hijoDer);
+		((arbolAVL) nodo.hijoDer).raiz = nuevaRaizDer;
+
+		return rotacionSimpleIzquierda(nodo);
+	}
 }

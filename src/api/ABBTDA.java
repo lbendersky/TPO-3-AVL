@@ -8,4 +8,5 @@ public interface ABBTDA {
 	ABBTDA hijoIzq();			// arbol inicializado y no vacio
 	ABBTDA hijoDer();			// arbol inicializado y no vacio
 	boolean arbolVacio();		// arbol inicializado 
+	int altura (); 				// arbol inicializado
 }
