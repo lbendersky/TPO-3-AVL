@@ -4,46 +4,46 @@ import api.ABBTDA;
 
 public class arbolAVL implements ABBTDA {
 
-	class NodoABB {
-		int info;
-		ABBTDA hijoIzq;
-		ABBTDA hijoDer;
-		int factorBalance;
+	class NodoABB { 
+		int info; // Valor del nodo.
+		ABBTDA hijoIzq; // Subárbol izquierdo.
+		ABBTDA hijoDer; // Subárbol derecho.
+		int factorBalance; // Factor de balanceo del nodo (altura derecha - altura izquierda).
 	}
 
-	NodoABB raiz;
+	NodoABB raiz; // Nodo raíz del árbol.
 
-	public int raiz() {
+	public int raiz() { // Devuelve valor almacenado en la raíz del árbol.
 		return raiz.info;
 	}
 
-	public ABBTDA hijoIzq() {
+	public ABBTDA hijoIzq() { // Devuelve subárbol izquierdo.
 		return raiz.hijoIzq;
 	}
 
-	public ABBTDA hijoDer() {
+	public ABBTDA hijoDer() { // Devuelve subárbol derecho.
 		return raiz.hijoDer;
 	}
 
-	public boolean arbolVacio() {
+	public boolean arbolVacio() { //Verifica si el árbol está vacío.
 		return (raiz == null);
 	}
 
-	private int mayor(ABBTDA a) {
+	private int mayor(ABBTDA a) { // Devuelve el mayor valor de un subárbol (recorre hacia la derecha).
 		if (a.hijoDer().arbolVacio())
 			return a.raiz();
 		else
 			return mayor(a.hijoDer());
 	}
 
-	private int menor(ABBTDA a) {
+	private int menor(ABBTDA a) { // Devuelve el menor valor de un subárbol (recorre hacia la izquierda).
 		if (a.hijoIzq().arbolVacio())
 			return a.raiz();
 		else
-			return mayor(a.hijoIzq());
+			return menor(a.hijoIzq());
 	}
 
-	public int altura() {
+	public int altura() { // Calcula altura del árbol.
 		if (arbolVacio()) {
 			return 0;
 		} else {
@@ -53,19 +53,19 @@ public class arbolAVL implements ABBTDA {
 		}
 	}
 
-	public void inicializarArbol() {
+	public void inicializarArbol() { // Inicializa el árbol vacío.
 		raiz = null;
 	}
 
-	public void agregarElem(int x) {
+	public void agregarElem(int x) { //Inserta un valor al árbol, lo balancea en caso de ser necesario.
 		raiz = agregarYBalancear(raiz, x);
 	}
 
-	public void eliminarElem(int x) {
+	public void eliminarElem(int x) { //Elimina un valor al árbol, lo balancea en caso de ser necesario.
 	    raiz = eliminarYBalancear(raiz, x);
 }
 
-	private NodoABB eliminarYBalancear(NodoABB nodo, int x) {
+	private NodoABB eliminarYBalancear(NodoABB nodo, int x) { //Lógica de eliminación con balanceo.
 		if (nodo == null) return null;
 
 		if (x < nodo.info) {
@@ -86,19 +86,19 @@ public class arbolAVL implements ABBTDA {
 			else if (nodo.hijoDer.arbolVacio()) {
 				return ((arbolAVL) nodo.hijoIzq).raiz;
 			}
-			// Caso 3: nodo con dos hijos
+			// Caso 3: nodo con dos hijos, se reemplaza por el menor del subárbol derecho.
 			else {
-				// Buscar sucesor: el menor del subárbol derecho
 				int sucesor = menor(nodo.hijoDer);
 				nodo.info = sucesor;
 				((arbolAVL) nodo.hijoDer).raiz = eliminarYBalancear(((arbolAVL) nodo.hijoDer).raiz, sucesor);
 			}
 		}
-		return verificarybalancear(nodo);
+		return verificarybalancear(nodo); 
 	}
 
 	private NodoABB agregarYBalancear(NodoABB nodo, int x) {
 		if (nodo == null) {
+			// Se crea un nuevo nodo.
 			NodoABB nuevo = new NodoABB();
 			nuevo.info = x;
 			nuevo.hijoIzq = new arbolAVL();
@@ -114,7 +114,7 @@ public class arbolAVL implements ABBTDA {
 		} else if (x > nodo.info) {
 			((arbolAVL) nodo.hijoDer).raiz = agregarYBalancear(((arbolAVL) nodo.hijoDer).raiz, x);
 		} else {
-			return nodo; // ya existe
+			return nodo; // Ya existe.
 		}
 
 		return verificarybalancear(nodo);
@@ -126,6 +126,7 @@ public class arbolAVL implements ABBTDA {
 		int balance = altDer - altIzq;
 
 		if (balance > 1) {
+			// Desbalance a la derecha.
 			NodoABB hijoDer = ((arbolAVL) nodo.hijoDer).raiz;
 			int balanceHijo = hijoDer.hijoDer.altura() - hijoDer.hijoIzq.altura();
 			if (balanceHijo >= 0) {
@@ -134,6 +135,7 @@ public class arbolAVL implements ABBTDA {
 				return rotacionDobleDerecha(nodo);
 			}
 		} else if (balance < -1) {
+			// Desbalance a la izquierda.
 			NodoABB hijoIzq = ((arbolAVL) nodo.hijoIzq).raiz;
 			int balanceHijo = hijoIzq.hijoDer.altura() - hijoIzq.hijoIzq.altura();
 			if (balanceHijo <= 0) {
@@ -145,8 +147,8 @@ public class arbolAVL implements ABBTDA {
 
 		return nodo;
 }
-
-	private NodoABB rotacionSimpleIzquierda (NodoABB nodo){
+ 
+	private NodoABB rotacionSimpleIzquierda (NodoABB nodo){ // Rotación simple izquierda para arreglar desbalance hacia la derecha.
 		NodoABB nododer = ((arbolAVL)nodo.hijoDer).raiz;
 		NodoABB subarbolintermedio = ((arbolAVL)nododer.hijoIzq).raiz;		
 
@@ -156,7 +158,7 @@ public class arbolAVL implements ABBTDA {
 		return nododer;
 	}
 
-	private NodoABB rotacionSimpleDerecha (NodoABB nodo){
+	private NodoABB rotacionSimpleDerecha (NodoABB nodo){ //  Rotación simple derecha para arreglar desbalance hacia la izquierda.
 		NodoABB nodoizq = ((arbolAVL) nodo.hijoIzq).raiz;
 		NodoABB subIntermedio = ((arbolAVL) nodoizq.hijoDer).raiz;
 
@@ -166,7 +168,7 @@ public class arbolAVL implements ABBTDA {
 
 		return nodoizq;	}
 
-	private NodoABB rotacionDobleIzquierda (NodoABB nodo){
+	private NodoABB rotacionDobleIzquierda (NodoABB nodo){ //  Rotación doble izquierda (izquierda-derecha).
 		NodoABB hijoIzq = ((arbolAVL) nodo.hijoIzq).raiz;
 		NodoABB nuevaRaizIzq = rotacionSimpleIzquierda(hijoIzq);
 		((arbolAVL) nodo.hijoIzq).raiz = nuevaRaizIzq;
@@ -174,7 +176,7 @@ public class arbolAVL implements ABBTDA {
 		return rotacionSimpleDerecha(nodo);
 	}
 
-	private NodoABB rotacionDobleDerecha (NodoABB nodo){
+	private NodoABB rotacionDobleDerecha (NodoABB nodo){ // Rotación doble derecha (derecha-izquierda).
 		NodoABB hijoDer = ((arbolAVL) nodo.hijoDer).raiz;
 		NodoABB nuevaRaizDer = rotacionSimpleDerecha(hijoDer);
 		((arbolAVL) nodo.hijoDer).raiz = nuevaRaizDer;
